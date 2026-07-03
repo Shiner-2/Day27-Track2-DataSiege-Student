@@ -1,7 +1,5 @@
-# Reflection (≤1 page)
+# Reflection
 
-Fill this in before you submit.
+The hardest faults to catch were the subtle distribution-shift and AI-infra drift cases that stayed close to the published baselines. A pure static-threshold detector is good at obvious failures like schema breaks, large runtime spikes, or heavy freshness lag, but it can miss cases where several signals each move only a little. The trickiest example was lineage: the event payload's declared inputs were not enough to define the clean graph shape, so relying on payload metadata alone created false positives. I handled that by learning a clean reference shape online from prior non-alerted runs and then flagging deviations from that learned norm.
 
-**Which fault types were hardest to catch, and why?**
-
-**What would you change about your cost/coverage tradeoff, if you had another pass?**
+If I had another pass, I would focus on reducing cost without giving up private-phase recall. Right now the defense spends one tool call on every event, which is still safe on practice and nearly full-coverage on public, but it does run a small budget overage there. A stronger second version would add a cheap first-stage gate from payload-only cues and historical context, then reserve the metered tool calls for events that are ambiguous or near the boundary. I would especially target embedding and feature events for that optimization, because those tools are the most expensive and their clean behavior becomes predictable after a few batches.
